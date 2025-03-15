@@ -1,112 +1,40 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
+import React, { useEffect, useState } from 'react';
+import { View, Text, Alert } from 'react-native';
+import DeviceInfo from 'react-native-device-info';
+import Sound from 'react-native-sound';
 
-import React from 'react';
-import {
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  useColorScheme,
-  View,
-} from 'react-native';
+const App = () => {
+  const [batteryLevel, setBatteryLevel] = useState(0);
 
-import {
-  Colors,
-  DebugInstructions,
-  Header,
-  LearnMoreLinks,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
+  useEffect(() => {
+    const checkBatteryLevel = async () => {
+      const level = await DeviceInfo.getBatteryLevel(); // Returns a value between 0 and 1
+      setBatteryLevel(level * 100); // Convert to percentage
 
-function Section({ children, title }) {
-  const isDarkMode = useColorScheme() === 'dark';
-  return (
-    <View style={styles.sectionContainer}>
-      <Text
-        style={[
-          styles.sectionTitle,
-          { color: isDarkMode ? Colors.white : Colors.black },
-        ]}>
-        {title}
-      </Text>
-      <Text
-        style={[
-          styles.sectionDescription,
-          { color: isDarkMode ? Colors.light : Colors.dark },
-        ]}>
-        {children}
-      </Text>
-    </View>
-  );
-}
+      if (level >= 1.0) {
+        playSound();
+      }
+    };
 
-function App() {
-  const isDarkMode = useColorScheme() === 'dark';
+    const interval = setInterval(checkBatteryLevel, 10000); // Check every 10 seconds
 
-  const backgroundStyle = {
-    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
+    return () => clearInterval(interval); // Cleanup interval on unmount
+  }, []);
+
+  const playSound = () => {
+    const bellSound = new Sound('bell_sound.mp3', Sound.MAIN_BUNDLE, (error) => {
+      if (!error) {
+        bellSound.play(); // Play the sound
+        Alert.alert('Battery Full', 'Your battery is fully charged!');
+      }
+    });
   };
 
-  const safePadding = '5%';
-
   return (
-    <View style={backgroundStyle}>
-      <StatusBar
-        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-        backgroundColor={backgroundStyle.backgroundColor}
-      />
-      <ScrollView style={backgroundStyle}>
-        <View style={{ paddingRight: safePadding }}>
-          <Header />
-        </View>
-        <View
-          style={{
-            backgroundColor: isDarkMode ? Colors.black : Colors.white,
-            paddingHorizontal: safePadding,
-            paddingBottom: safePadding,
-          }}>
-          <Section title="Step One">
-            Edit <Text style={styles.highlight}>App.js</Text> to change this
-            screen and then come back to see your edits.
-          </Section>
-          <Section title="See Your Changes">
-            <ReloadInstructions />
-          </Section>
-          <Section title="Debug">
-            <DebugInstructions />
-          </Section>
-          <Section title="Learn More">
-            Read the docs to discover what to do next:
-          </Section>
-          <LearnMoreLinks />
-        </View>
-      </ScrollView>
+    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+      <Text>Battery Level: {batteryLevel.toFixed(0)}%</Text>
     </View>
   );
-}
-
-const styles = StyleSheet.create({
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
-  },
-  sectionTitle: {
-    fontSize: 50,
-    fontWeight: '600',
-  },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
-  },
-  highlight: {
-    fontWeight: '700',
-  },
-});
+};
 
 export default App;

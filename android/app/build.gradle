@@ -108,6 +108,8 @@ android {
 }
 
 dependencies {
+
+     // Add push notification dependencies
     implementation project(':react-native-device-info')
     // The version of react-native is set by the React Native Gradle Plugin
     implementation("com.facebook.react:react-android")
@@ -118,3 +120,4 @@ dependencies {
         implementation jscFlavor
     }
 }
+

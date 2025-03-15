@@ -8,24 +8,13 @@ const App = () => {
   const [isPlaying, setIsPlaying] = useState(false);
   let sound = null;
 
-  // Function to test the sound manually
-  const testSound = () => {
-    const soundTest = new Sound('bell_sound.mp3', Sound.MAIN_BUNDLE, (error) => {
-      if (error) {
-        console.log("Error loading sound:", error);
-      } else {
-        soundTest.play(() => console.log("Sound played"));
-      }
-    });
-  };
-
   useEffect(() => {
     const checkBatteryLevel = async () => {
       const level = await DeviceInfo.getBatteryLevel();
       setBatteryLevel(level * 100); // Set battery percentage
 
       // Only trigger sound if battery level >= 79% and sound is not playing
-      if (level >= 0.80 && !isPlaying) {
+      if (level >= 0.81 && !isPlaying) {
         playSoundOnce(); // Play sound only once when condition met
       }
     };
@@ -60,7 +49,6 @@ const App = () => {
     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
       <Text>Battery Level: {batteryLevel.toFixed(0)}%</Text>
       {isPlaying && <Button title="Stop Sound" onPress={stopSound} />}
-      <Button title="Test Sound" onPress={testSound} /> {/* Add test button */}
     </View>
   );
 };
